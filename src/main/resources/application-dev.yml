@@ -1,0 +1,17 @@
+server:
+  port: 8200
+spring:
+  servlet:
+    multipart:
+      max-file-size: -1MB
+      max-request-size: -1MB
+  application:
+    # 应用名称
+    name: gis-server-mbtiles
+
+knife4j:
+  enable: true
+
+
+MBData:
+  path: E:/data/mbtiles

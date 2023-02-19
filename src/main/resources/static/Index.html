@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet"
+	href="/lib/element-ui/lib/theme-chalk/index.css">
+<title>配置信息</title>
+<style type="text/css">
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.bg-purple-dark {
+	background: #99a9bf;
+}
+
+.el-row {
+	margin: 10px;
+}
+
+.titleHeight {
+	height: 40px;
+}
+
+#app {
+	margin: 0;
+	padding: 0;
+}
+
+.tilefont {
+	font-size: 18pt;
+	margin-left: 20px;
+}
+
+.infotitle {
+	font-weight: bold;
+}
+</style>
+</head>
+<body>
+	<div id="app">
+		<div class="bg-purple-dark titleHeight">
+			<span class="tilefont">mbtiles配置信息页面</span>
+		</div>
+
+		<el-row> <el-col :span="24">
+		<div>
+			<span class="infotitle">服务器根目录：</span> {{ datapath }}
+		</div>
+		</el-col> </el-row>
+
+		<el-row> <el-col :span="24">
+		<div>
+			<span class="infotitle">图层信息：</span>
+		</div>
+		<el-table :data="mblistData" stripe style="width: 100%"> <el-table-column
+			prop="mname" label="图层名称" width="180"> </el-table-column> <el-table-column
+			prop="mbFile" label="图层路径" width="360"> </el-table-column> <el-table-column
+			label="详情" width="100"> <template
+			slot-scope="scope"> <el-button
+			@click="detailInfo(scope.row)" type="text" size="small">查看</el-button>
+		</template> </el-table-column> </el-table> </el-col> </el-row>
+
+		<el-row> <el-col :span="24"> <span class="infotitle">地图切片访问Url：</span>http://[IP:PORT]/mbtiles/[图层名称]/[zoom]/[x]/[y]
+		</el-col> </el-row>
+
+		<el-row> <el-col :span="24"> <span class="infotitle">刷新图层目录：</span>
+		<el-button size="small" @click="refreshLayer">刷新</el-button> </el-col> </el-row>
+
+		<el-dialog :visible.sync="infovisible" title="图层详细信息">
+		<div>
+			<span class="infotitle">图层名称：</span> {{ infoObject.tilesetName }}
+		</div>
+		<div>
+			<span class="infotitle">切片格式：</span> {{ infoObject.tileMimeType }}
+		</div>
+		<div>
+			<span class="infotitle">切片类型：</span> {{ infoObject.tilesetType }}
+		</div>
+		<div>
+			<span class="infotitle">切片版本：</span> {{ infoObject.tilesetVersion }}
+		</div>
+		</el-dialog>
+	</div>
+</body>
+<script src="/lib/vue.min.js"></script>
+<script src="/lib/element-ui/lib/index.js"></script>
+<script src="/lib/axios.min.js"></script>
+
+<script type="text/javascript">
+function getLayerList()
+{
+   axios.get('/mbtiles/datalist')
+	 .then(function (response) {  
+		vue.mblistData =  response.data; 
+		})
+	   .catch(function (error) { 
+			    console.log(error);
+		}); 
+}
+
+window.onload = function ()
+{ 
+axios.get('/mbtiles/dataPath')
+ .then(function (response) {  
+	vue.datapath =  response.data.path; 
+	})
+   .catch(function (error) { 
+		    console.log(error);
+	});  
+	
+   getLayerList();
+};
+ 
+	var vue = new Vue({
+		el : '#app',
+		data : function() {
+			return {
+				visible : false,
+				datapath:"",
+				mblistData:[],
+				infovisible:false,
+				infoObject:{},
+			}
+		},
+		 methods: {
+			 refreshLayer:function()
+			 {
+				 axios.get('/mbtiles/refresh')
+				 .then(function (response) {  
+					  if(response.data.isSuc)
+						  {
+						  getLayerList();
+						  }else
+							  {
+							  alert(response.data.errorMsg);
+							  }
+					})
+				   .catch(function (error) { 
+						    console.log(error);
+					});  
+			 }, 
+			 detailInfo:function (row)
+			 {
+				 axios.get('/mbtiles/'+row.mname+'/metadata')
+				 .then(function (response) {  
+					vue.infoObject =  response.data; 
+					 vue.infovisible = true;
+					})
+				   .catch(function (error) { 
+						    console.log(error);
+					});  
+				
+				 //console.log(row.mname);
+			 }
+		 }
+	});
+	
+	 
+</script>
+</html>
