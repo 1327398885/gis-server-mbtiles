@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>500</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/error.css">
+</head>
+<body>
+<img src="/static/imgs/error/500.gif">
+<h1>您所访问的页面信息缺失！<a href="/">点击</a>回到首页</h1>
+<h2><span id="time">5</span>s后自动跳转到首页！</h2>
+</body>
+<script>
+    var time = document.getElementById("time");
+    window.setInterval(function () {
+        time.innerHTML -= 1;
+        if(time.innerHTML <1){
+            window.location.href="/";
+        }
+    },1000)
+</script>
+</html>

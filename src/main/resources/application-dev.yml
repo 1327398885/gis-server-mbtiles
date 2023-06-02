@@ -8,6 +8,11 @@ spring:
   application:
     # 应用名称
     name: gis-server-mbtiles
+  mvc:
+    static-path-pattern: static/**
+  thymeleaf:
+    cache: false
+    mode: HTML
 
 knife4j:
   enable: true
